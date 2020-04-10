@@ -33,7 +33,7 @@ def tanh(x, derivate=False):
         return f
 
 
-def softmax(f, derivate=False):
+def softmax(x, derivate=False):
     """
     Compute softmax derivate of x
     
@@ -47,5 +47,34 @@ def softmax(f, derivate=False):
 
     if derivate:
         pass
+    else:
+        return f
+
+
+def cross_entropy(predictions, targets, epsilon=1e-12):
+    """
+    Computes cross entropy between targets (encoded as one-hot vectors)
+    and predictions.
+    Input: predictions (N, k)
+           targets (N, k)
+    Returns: scalar
+    """
+    predictions = np.clip(predictions, epsilon, 1. - epsilon)
+    cross_entropy = -np.mean(targets*np.log(predictions+1e-9))
+    return cross_entropy
+
+
+def log_loss(y_predicted, y, derivate=False):
+    """
+    Compute the log loss between the predicted output and the real output
+    Args:
+        y_predicted ([type]): [description]
+        y ([type]): [description]
+        derivate (bool, optional): [description]. Defaults to False.
+    """
+    f = - y * np.log(y_predicted)
+
+    if derivate:
+        return - y / y_predicted
     else:
         return f
