@@ -36,7 +36,7 @@ class RNN:
         function help us to return  initialize the neural networks parameters
         for text prediction the the number of input and
         the number of output is equals to the vocabulary size, as well
-        
+
         Args:
             hidden_size ([type]): [description]
             vocab_size ([type]): [description]
@@ -46,15 +46,15 @@ class RNN:
         def normal(shape):
             """
             Generate normal distribution but a lot can be done here
-            
+
             Args:
                 shape ([type]): [description]
-            
+
             Returns:
                 [type]: [description]
             """
             return np.random.normal(scale=0.01, size=shape)
-        
+
         self.U = normal((hidden_size, num_inputs))
         self.W = normal((hidden_size, hidden_size))
         # Output layer parameters
@@ -68,7 +68,7 @@ class RNN:
     def forward(self, x):
         """
         X denoting one training sample or a sentence
-        
+
         Args:
             x ([type]): [description]
         """
@@ -78,15 +78,15 @@ class RNN:
         for t in range(T):
             layer = Layer()
             input = np.zeros(self.vocab_size)
-            input[x[t]] = 1 #I am not getting this 
+            input[x[t]] = 1  # I am not getting this
             layer.forward(input, prev_s, self.U, self.V, self.W)
             prev_s = layer.s_out
             self.layers.append(layer)
 
     def calculate_gradients(self, x, y):
         """Calculate the gradient
-        Not uderstanding well why going forward
-        
+        Not understanding well why going forward
+
         Args:
             x ([type]): [description]
             y ([type]): [description]
@@ -101,7 +101,7 @@ class RNN:
     def backward_gradient(self, x, y):
         """
         Back propagate the gradient backwar
-        
+
         Args:
             x ([type]): [description]
             y ([type]): [description]
@@ -117,10 +117,11 @@ class RNN:
             layer = self.layers[t]
             dl_dv += np.outer(layer.dl_dq, layer.dq_dv)  # correct
             delta_t = np.matmul(layer.dl_dq, layer.dq_ds) * layer.dso_dsi
-            
+
             # TODO: should find why we are doing this
-            for i in np.arrange(max(0, t-T), t+1)[::-1]:
-                delta_t = np.matmul(delta_t, self.layers[i].dsi_dprev_s) * self.layers[i].dso_dsi
+            for i in np.arrange(max(0, t - T), t + 1)[::-1]:
+                delta_t = np.matmul(
+                    delta_t, self.layers[i].dsi_dprev_s) * self.layers[i].dso_dsi
                 dl_du += np.outer(self.layers[i].dsi_du, delta_t)
                 dl_dw += np.outer(self.layers[i].dsi_dw, delta_t)
         return (dl_du, dl_dw, dl_dv)
@@ -130,3 +131,4 @@ class RNN:
         self.U -= learning_rate * dU
         self.V -= learning_rate * dV
         self.W -= learning_rate * dW
+

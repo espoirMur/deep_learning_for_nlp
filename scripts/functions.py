@@ -9,7 +9,7 @@ def sigmoid(x, derivate=False):
         derivate (bool, optional): [description]. Defaults to False.
     """
     x = x + 1e-12  # why are we doing this?
-    f = 1/(1 + np.exp(x))
+    f = 1 / (1 + np.exp(x))
     if derivate:
         f = f * (1 - f)
     else:
@@ -19,14 +19,14 @@ def sigmoid(x, derivate=False):
 def tanh(x, derivate=False):
     """
     Compute tanh function
-    
+
     Args:
         x ([type]): [description]
         derivate (bool, optional): [description]. Defaults to False.
     """
     x = x + 1e-12
 
-    f = (np.exp(x) - np.exp(-x))/(np.exp(x) + np.exp(-x))
+    f = (np.exp(x) - np.exp(-x)) / (np.exp(x) + np.exp(-x))
     if derivate:
         return 1 - f**2
     else:
@@ -36,7 +36,7 @@ def tanh(x, derivate=False):
 def softmax(x, derivate=False):
     """
     Compute softmax derivate of x
-    
+
     Args:
         f ([type]): [description]
         derivate (bool, optional): [description]. Defaults to False.
@@ -60,7 +60,7 @@ def cross_entropy(predictions, targets, epsilon=1e-12):
     Returns: scalar
     """
     predictions = np.clip(predictions, epsilon, 1. - epsilon)
-    cross_entropy = -np.mean(targets*np.log(predictions+1e-9))
+    cross_entropy = -np.mean(targets * np.log(predictions + 1e-9))
     return cross_entropy
 
 
