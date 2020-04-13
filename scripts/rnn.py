@@ -63,9 +63,13 @@ class RNNumpy:
         return np.argmax(o, axis=1)
 
     def calculate_loss(self, y_predicted, y):
+        """
+        this will calculate the loss for one training example
+        we calculate the loss of y_1, y2,y3     and  be find the mean of it
+        TODO : is this the right approach?
+        """
         log_loss = y * np.log(y_predicted)
-        cross_entropy = -np.mean(log_loss)
-        return cross_entropy
+        return -np.mean(np.sum(log_loss, axis=1))
 
     def back_propagation_trough_time(self, x, y):
         T = len(y)
