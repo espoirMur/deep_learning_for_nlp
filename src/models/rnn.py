@@ -129,7 +129,7 @@ def train_with_sgd(
             print(
                 '{} loss after number of example seen = {} epoch = {}: {}'.format(
                     time, num_examples_seen, epoch, loss))
-            
+
             # setting the learning rate if it's increasing
             if(len(losses) > 1 and losses[-1][1] > losses[-2][1]):
                 learning_rate = learning_rate * 0.5

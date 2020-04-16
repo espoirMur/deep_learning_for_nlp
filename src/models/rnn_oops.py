@@ -131,4 +131,3 @@ class RNN:
         self.U -= learning_rate * dU
         self.V -= learning_rate * dV
         self.W -= learning_rate * dW
-
