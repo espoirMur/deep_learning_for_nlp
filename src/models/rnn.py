@@ -1,11 +1,11 @@
 import sys
 import numpy as np
-from .functions import softmax, tanh
 from datetime import datetime
+from functions import tanh, softmax
 
 
 class RNNumpy:
-    def __init__(self, hidden_size, vocab_size, bptt_truncate=4):
+    def __init__(self, vocab_size, hidden_size=100, bptt_truncate=4):
         """
         function help us to return  initialize the neural networks parameters
         for text prediction the the number of input and
@@ -50,11 +50,17 @@ class RNNumpy:
         """
         T = len(x)
         # we are saving all s in an numpy array
-        s = np.zeros((T, self.hidden_size))
+        s = np.zeros((T+1, self.hidden_size))
         s[-1] = np.zeros(self.hidden_size)  # we initialize it with zeros
-        o = np.zeros((T, self.word_dim))
+        o = np.zeros((T, self.vocab_size))
         for t in np.arange(T):
-            s[t] = tanh(np.dot(self.U, x[t]) + self.W.dot(s[t - 1]))
+            # x is comming as an array of numbers we need to convert each
+            # number to on hot vector
+            x_vector = np.zeros(self.vocab_size)
+
+            x_vector[x[t]] = 1
+            
+            s[t] = tanh(np.dot(self.U, x_vector) + self.W.dot(s[t - 1]))
             o[t] = softmax(self.V.dot(s[t]))
         return o, s
 
@@ -62,14 +68,25 @@ class RNNumpy:
         o, s = self.forward(x)
         return np.argmax(o, axis=1)
 
-    def calculate_loss(self, y_predicted, y):
+    def calculate_loss(self, x, y):
         """
         this will calculate the loss for one training example
         we calculate the loss of y_1, y2,y3     and  be find the mean of it
         TODO : is this the right approach?
         """
-        log_loss = y * np.log(y_predicted)
+        y_predicted, _ = self.forward(x)
+        
+        # one hot encoding y
+        y_vector = np.zeros((len(y), self.vocab_size))
+        y_vector[np.arange(len(y)), y] = 1
+        log_loss = y_vector * np.log(y_predicted)
         return -np.mean(np.sum(log_loss, axis=1))
+
+    def calculate_total_loss(self, X, Y):
+        loss = 0.0
+        for i in range(len(Y)):
+            loss += self.calculate_loss(X[i], Y[i])
+        return loss / float(len(Y))
 
     def back_propagation_trough_time(self, x, y):
         T = len(y)
@@ -77,12 +94,13 @@ class RNNumpy:
         dl_dU = np.zeros(self.U.shape)
         dl_dV = np.zeros(self.V.shape)
         dl_dW = np.zeros(self.W.shape)
-        delta_o = o
         # TODO: should implement o-Y
         # seems to understand this but , I can improve it and make it readble
-        delta_o[np.arrange(len(y)), y] -= 1
-        for t in np.arrange(T):
-            dl_dV += np.outer(delta_o[t], s[t])
+        # o_t - y_t
+        delta_o = o
+        delta_o[np.arange(len(y)), y] -= 1
+        for t in np.arange(T):
+            dl_dV += np.outer(delta_o[t], s[t].T)
             delta_t = self.V.T.dot(delta_o[t]) * (1 - (np.power(s[t], 2)))
 
             # TODO this part is not well understood, will improve it
@@ -123,8 +141,8 @@ def train_with_sgd(
     num_examples_seen = 0
     for epoch in range(nepoch):
         if (epoch % evaluate_loss_after == 0):
-            loss = model.calculate_loss(x_train, y_train)
-            losses.append((num_examples_seen, loss))
+            loss = model.calculate_total_loss(x_train, y_train)
+            losses.append((epoch, num_examples_seen, loss))
             time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             print(
                 '{} loss after number of example seen = {} epoch = {}: {}'.format(
@@ -135,6 +153,7 @@ def train_with_sgd(
                 learning_rate = learning_rate * 0.5
                 print(f"setting learning rate to {learning_rate}")
             sys.stdout.flush()
-    for i in range(len(y_train)):
-        model.sgd_step(x_train[i], y_train[i], learning_rate)
-        num_examples_seen += 1
+        for i in range(len(y_train)):
+            model.numpy_sgd_step(x_train[i], y_train[i], learning_rate)
+            num_examples_seen += 1
+    return losses

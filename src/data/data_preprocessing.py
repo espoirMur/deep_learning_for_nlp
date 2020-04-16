@@ -29,7 +29,8 @@ def tokenize_sentence(sentences: List[str]) -> List[str]:
     Args:
         sentences ([type]): [description]
     """
-    tokenize_sentences = [nltk.word_tokenize(sentence) for sentence in sentences]
+    tokenize_sentences = [nltk.word_tokenize(
+        sentence) for sentence in sentences]
     tokenize_sentences = list(filter(lambda x: len(x) > 3, tokenize_sentences))
     return tokenize_sentences
 
@@ -129,15 +130,19 @@ def get_sentence_data(path, vocabulary_size=8000):
     word_freq = get_word_frequencies(tokenize_sentences)
 
     print(f"Found {len(word_freq.items())} unique words tokens.")
-    vocab, index_to_word, word_to_index = build_word_indexes(word_freq, vocabulary_size)
+    vocab, index_to_word, word_to_index = build_word_indexes(
+        word_freq, vocabulary_size)
 
     print("Using vocabulary size {}.".format(vocabulary_size))
-    print("The least frequent word in our vocabulary is '{}' and appeared {} times.".format(vocab[-1][0], vocab[-1][1]))
+    print("The least frequent word in our vocabulary is '{}' and appeared {} times.".format(
+        vocab[-1][0], vocab[-1][1]))
 
-    tokenize_sentences = replace_unknown_words(tokenize_sentences, word_to_index)
+    tokenize_sentences = replace_unknown_words(
+        tokenize_sentences, word_to_index)
 
     print("\nExample sentence: '{}'".format(sentences[1]))
-    print("\nExample sentence after Pre-processing: '{}'\n".format(tokenize_sentences[0]))
+    print(
+        "\nExample sentence after Pre-processing: '{}'\n".format(tokenize_sentences[0]))
 
     X_train, Y_train = create_training_data(tokenize_sentences, word_to_index)
 
@@ -146,10 +151,8 @@ def get_sentence_data(path, vocabulary_size=8000):
 
     # Print an training data example
     x_example, y_example = X_train[17], Y_train[17]
-    print('x: \n {} \n {}'.format(" ".join([index_to_word[x] for x in x_example]), x_example))
-    print('y: \n {} \n {}'.format(" ".join([index_to_word[x] for x in y_example]), y_example))
+    print('x: \n {} \n {}'.format(
+        " ".join([index_to_word[x] for x in x_example]), x_example))
+    print('y: \n {} \n {}'.format(
+        " ".join([index_to_word[x] for x in y_example]), y_example))
     return X_train, Y_train
-
-
-if __name__ == "__main__":
-    X_train, Y_train = get_sentence_data('data/raw/reddit-comments-2015-08.csv')
