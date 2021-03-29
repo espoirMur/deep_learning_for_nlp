@@ -119,7 +119,7 @@ pyasn1-modules==0.2.8
 pycodestyle==2.5.0
 pycparser==2.19
 pyflakes==2.1.1
-Pygments==2.5.2
+Pygments==2.7.4
 PyMySQL==0.9.3
 pyparsing==2.4.5
 pyrsistent==0.15.7
