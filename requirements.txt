@@ -158,7 +158,7 @@ traitlets==4.3.3
 turicreate==6.1
 tweepy==3.8.0
 Unidecode==0.4.21
-urllib3==1.24.3
+urllib3==1.26.5
 validators==0.14.1
 virtualenv==16.7.9
 wcwidth==0.1.7
